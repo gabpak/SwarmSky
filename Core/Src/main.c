@@ -18,10 +18,15 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "i2c.h"
+#include "mpu6050.h"
+#include "uart.h"
+#include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <string.h>
+#include <stdio.h>
 
 /* USER CODE END Includes */
 
@@ -41,18 +46,17 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-UART_HandleTypeDef huart1;
+
+
+
 
 /* USER CODE BEGIN PV */
-
+MPU6050_t MPU6050;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
-static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
-void debug_uart(const char *message); // Fonction de debug sur UART1
 
 /* USER CODE END PFP */
 
@@ -91,12 +95,19 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART1_UART_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
+  while (MPU6050_Init(&hi2c1) == 1);
 
+  for(uint8_t i = 0; i < GYRO_AVERAGE_SIZE; i++){
+	  gyro_x_buffer[i] = 0;
+	  gyro_y_buffer[i] = 0;
+	  gyro_z_buffer[i] = 0;
+  }
 
   /* USER CODE END 2 */
-
+  int x = 0;
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -104,10 +115,25 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-	  HAL_Delay(650);
 
-	  debug_uart("Hello my UART1!\n");
+	  char msg[64];
+	  //HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+	  MPU6050_Read_All(&hi2c1, &MPU6050);
+	  HAL_Delay(5);
+
+	  //double gyro_x_average = MPU6050_Moving_Average(gyro_x_buffer, MPU6050.);
+	  x++;
+	  if(x > 250){
+		  x = 0;
+		  sprintf(msg, "GyroX: %f\n", MPU6050.KalmanAngleX);
+		  debug_uart(msg);
+		  sprintf(msg, "GyroY: %f\n\n", MPU6050.KalmanAngleY);
+		  debug_uart(msg);
+		  //sprintf(msg, "===========\n");
+		  //debug_uart(msg);
+	  }
+
+
   }
   /* USER CODE END 3 */
 }
@@ -148,74 +174,6 @@ void SystemClock_Config(void)
   }
 }
 
-/**
-  * @brief USART1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART1_UART_Init(void)
-{
-
-  /* USER CODE BEGIN USART1_Init 0 */
-
-  /* USER CODE END USART1_Init 0 */
-
-  /* USER CODE BEGIN USART1_Init 1 */
-
-  /* USER CODE END USART1_Init 1 */
-  huart1.Instance = USART1;
-  huart1.Init.BaudRate = 9600;
-  huart1.Init.WordLength = UART_WORDLENGTH_8B;
-  huart1.Init.StopBits = UART_STOPBITS_1;
-  huart1.Init.Parity = UART_PARITY_NONE;
-  huart1.Init.Mode = UART_MODE_TX_RX;
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USART1_Init 2 */
-
-  /* USER CODE END USART1_Init 2 */
-
-}
-
-/**
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_GPIO_Init(void)
-{
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-/* USER CODE BEGIN MX_GPIO_Init_1 */
-/* USER CODE END MX_GPIO_Init_1 */
-
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOD_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LED_13_GPIO_Port, LED_13_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin : LED_13_Pin */
-  GPIO_InitStruct.Pin = LED_13_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LED_13_GPIO_Port, &GPIO_InitStruct);
-
-/* USER CODE BEGIN MX_GPIO_Init_2 */
-/* USER CODE END MX_GPIO_Init_2 */
-}
-
-/* USER CODE BEGIN 4 */
-void debug_uart(const char *message){
-	int message_len = strlen(message);
-	HAL_UART_Transmit(&huart1, (uint8_t *)message, (uint16_t)message_len, 100);
-}
 /* USER CODE END 4 */
 
 /**
