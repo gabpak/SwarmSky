@@ -6,12 +6,6 @@
 #include "i2c.h"
 #include <stdint.h>
 
-#define GYRO_AVERAGE_SIZE 10
-extern int16_t gyro_x_buffer[GYRO_AVERAGE_SIZE];
-extern int16_t gyro_y_buffer[GYRO_AVERAGE_SIZE];
-extern int16_t gyro_z_buffer[GYRO_AVERAGE_SIZE];
-extern uint8_t buffer_index;
-
 // MPU6050 structure
 typedef struct
 {
@@ -58,5 +52,3 @@ void MPU6050_Read_Temp(I2C_HandleTypeDef *I2Cx, MPU6050_t *DataStruct);
 void MPU6050_Read_All(I2C_HandleTypeDef *I2Cx, MPU6050_t *DataStruct);
 
 double Kalman_getAngle(Kalman_t *Kalman, double newAngle, double newRate, double dt);
-
-double MPU6050_Moving_Average(uint16_t *buffer, uint16_t new_value);

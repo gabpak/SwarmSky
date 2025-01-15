@@ -17,12 +17,6 @@
 const uint16_t i2c_timeout = 100;
 const double Accel_Z_corrector = 14418.0;
 
-// Mesures (moyenne)
-int16_t gyro_x_buffer[GYRO_AVERAGE_SIZE];
-int16_t gyro_y_buffer[GYRO_AVERAGE_SIZE];
-int16_t gyro_z_buffer[GYRO_AVERAGE_SIZE];
-uint8_t buffer_index = 0;
-
 uint32_t timer;
 
 Kalman_t KalmanX = {
@@ -209,13 +203,3 @@ double Kalman_getAngle(Kalman_t *Kalman, double newAngle, double newRate, double
 
     return Kalman->angle;
 };
-
-double MPU6050_Moving_Average(uint16_t *buffer, uint16_t new_value){
-    int32_t sum = 0;
-    buffer[buffer_index] = new_value;
-    for (uint8_t i = 0; i < GYRO_AVERAGE_SIZE; i++) {
-        sum += buffer[i];
-    }
-    buffer_index = (buffer_index + 1) % GYRO_AVERAGE_SIZE;
-    return sum / GYRO_AVERAGE_SIZE;
-}
