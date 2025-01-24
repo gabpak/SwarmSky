@@ -27,10 +27,7 @@ public:
 	}
 
 	T* get(uint16_t index){
-	    if(index >= ISR_LIST.size() || ISR_LIST[index] == nullptr){
-	        return nullptr;
-	    }
-	    return ISR_LIST[index];
+	    return ISR_LIST[index]; // Not safe but fast ! (because always walled by interrupts)
 	}
 
 	uint16_t size(){

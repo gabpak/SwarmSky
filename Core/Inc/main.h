@@ -59,9 +59,21 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define LED_13_Pin GPIO_PIN_13
 #define LED_13_GPIO_Port GPIOC
-#define EXTI_PA3_Pin GPIO_PIN_3
-#define EXTI_PA3_GPIO_Port GPIOA
-#define EXTI_PA3_EXTI_IRQn EXTI3_IRQn
+#define PWM_Killswitch_Pin GPIO_PIN_4
+#define PWM_Killswitch_GPIO_Port GPIOA
+#define PWM_Killswitch_EXTI_IRQn EXTI4_IRQn
+#define PWM_Pitch_Pin GPIO_PIN_5
+#define PWM_Pitch_GPIO_Port GPIOA
+#define PWM_Pitch_EXTI_IRQn EXTI9_5_IRQn
+#define PWM_Thrust_Pin GPIO_PIN_6
+#define PWM_Thrust_GPIO_Port GPIOA
+#define PWM_Thrust_EXTI_IRQn EXTI9_5_IRQn
+#define PWM_Yaw_Pin GPIO_PIN_7
+#define PWM_Yaw_GPIO_Port GPIOA
+#define PWM_Yaw_EXTI_IRQn EXTI9_5_IRQn
+#define PWM_Roll_Pin GPIO_PIN_8
+#define PWM_Roll_GPIO_Port GPIOA
+#define PWM_Roll_EXTI_IRQn EXTI9_5_IRQn
 
 /* USER CODE BEGIN Private defines */
 
